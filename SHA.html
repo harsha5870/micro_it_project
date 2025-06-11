@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hash Generator - SHA-256</title>
+    <style>
+        /* General Reset */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        /* Background and basic styling */
+        body {
+            font-family: 'Courier New', monospace;
+            background: #121212; /* Dark background for a high-tech look */
+            color: #fff;
+            text-align: center;
+            padding: 50px 0;
+            overflow: hidden;
+            font-size: 16px;
+            animation: fadeInBody 1.5s ease-out; /* Fade-in effect for the body */
+        }
+
+        /* Pop-out screen styling */
+        #popupScreen {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background-color: rgba(0, 0, 0, 0.8);
+            color: white;
+            text-align: center;
+            font-size: 32px;
+            padding-top: 100px;
+            z-index: 9999;
+            animation: popupEffect 0.5s ease-out;
+        }
+
+        /* Pop-out screen animation */
+        @keyframes popupEffect {
+            0% { opacity: 0; transform: scale(0.5); }
+            100% { opacity: 1; transform: scale(1); }
+        }
+
+        .popup-content {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+        }
+
+        .warning-icon {
+            font-size: 80px;
+            color: #ff4040;
+            margin-bottom: 20px;
+            animation: shake 0.5s ease-in-out infinite; /* Warning icon shake effect */
+        }
+
+        /* Warning icon shake effect */
+        @keyframes shake {
+            0% { transform: translateX(-10px); }
+            25% { transform: translateX(10px); }
+            50% { transform: translateX(-10px); }
+            75% { transform: translateX(10px); }
+            100% { transform: translateX(0); }
+        }
+
+        h1 {
+            font-size: 42px;
+            margin-bottom: 20px;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: #00ffcc; /* Neon color */
+            text-shadow: 0 0 20px #00ffcc, 0 0 30px #00ffcc;
+            animation: fadeInText 2s ease-out; /* Fade-in for the header */
+        }
+
+        h3 {
+            font-size: 18px;
+            margin: 15px 0;
+            color: #aaa;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            animation: fadeInText 2s ease-out; /* Fade-in for subheading */
+        }
+
+        .container {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 30px;
+            max-width: 600px;
+            margin: 0 auto;
+            box-shadow: 0 4px 15px rgba(0, 255, 204, 0.3); /* Glow effect */
+            backdrop-filter: blur(10px); /* Blur effect for background */
+            animation: fadeInContainer 2s ease-out; /* Fade-in for the container */
+        }
+
+        /* Input Styling */
+        input {
+            width: 80%;
+            padding: 15px;
+            border-radius: 10px;
+            border: none;
+            outline: none;
+            font-size: 16px;
+            margin: 10px 0;
+            background: #333;
+            color: #00ffcc;
+            border: 2px solid #00ffcc;
+            text-align: center;
+            box-shadow: 0 0 10px rgba(0, 255, 204, 0.4);
+            transition: all 0.3s ease;
+            animation: inputFocus 0.5s ease-in-out; /* Smooth transition on input focus */
+        }
+
+        /* Button Styling */
+        button {
+            background-color: #00ffcc;
+            color: #121212;
+            font-size: 18px;
+            padding: 12px 30px;
+            border-radius: 10px;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            box-shadow: 0 0 15px rgba(0, 255, 204, 0.4);
+            animation: buttonHover 0.5s ease-out; /* Button hover effect */
+        }
+
+        button:hover {
+            background-color: #00e5cc;
+            box-shadow: 0 0 25px rgba(0, 255, 204, 0.6);
+        }
+
+        /* Result Container Styling */
+        .result-container {
+            margin-top: 20px;
+            word-wrap: break-word;
+            max-width: 90%;
+            background: #1c1c1c; /* Dark background */
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 6px 15px rgba(0, 255, 204, 0.4);
+            color: #00ffcc; /* Neon text color */
+            font-family: 'Courier New', monospace;
+            animation: fadeInResult 2s ease-out; /* Fade-in for result */
+            text-align: left;
+            margin-left: 5%; /* Added margin-left to move it right */
+        }
+
+        /* Error Message Styling */
+        .error-message {
+            color: #ff4040;
+            font-size: 16px;
+            margin-top: 15px;
+        }
+
+        /* Glowing Border for Buttons and Input */
+        input:focus, button:active {
+            outline: none;
+            border: 2px solid #00ffcc;
+            box-shadow: 0 0 15px rgba(0, 255, 204, 0.5);
+        }
+
+        /* Animation for Input Focus */
+        @keyframes inputFocus {
+            0% { box-shadow: 0 0 10px rgba(0, 255, 204, 0); }
+            100% { box-shadow: 0 0 15px rgba(0, 255, 204, 0.5); }
+        }
+
+        /* Button Hover Animation */
+        @keyframes buttonHover {
+            0% { transform: scale(1); }
+            100% { transform: scale(1.1); }
+        }
+
+        /* Cancel Button Styling (Red) */
+        #cancelPdfButton {
+            background-color: #ff4040; /* Red color */
+            color: #fff;
+            font-size: 18px;
+            padding: 12px 30px;
+            border-radius: 10px;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            box-shadow: 0 0 15px rgba(255, 64, 64, 0.4);
+        }
+
+        #cancelPdfButton:hover {
+            background-color: #ff3333; /* Darker red color on hover */
+            box-shadow: 0 0 25px rgba(255, 64, 64, 0.6);
+        }
+
+        /* Style for Small Screens */
+        @media screen and (max-width: 600px) {
+            .container {
+                padding: 20px;
+            }
+
+            input {
+                width: 90%;
+                font-size: 14px;
+            }
+
+            button {
+                width: 100%;
+                padding: 10px;
+                font-size: 16px;
+            }
+
+            #cancelPdfButton {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div id="popupScreen">
+        <div class="popup-content">
+            <div class="warning-icon">&#9888;</div> <!-- Warning symbol (exclamation mark) -->
+            <h1>Too many attempts please try later.</h1>
+        </div>
+    </div>
+
+    <div class="container">
+        <h1>SHA-256 Hash Generator</h1>
+        <h3>Enter text or upload a file (images, videos, PDFs, etc.) to generate its SHA-256 hash:</h3>
+
+        <input type="text" id="inputText" placeholder="Enter any text here..." />
+        <br><br>
+        <input type="file" id="fileInput" />
+        
+        <button onclick="generateHash()">Generate Hash</button>
+
+        <!-- Cancel PDF button -->
+        <button id="cancelPdfButton" onclick="cancelFileSelection()" style="margin-top: 10px;">Cancel Selected File</button>
+        
+        <div class="result-container">
+            <h3>Generated Hash:</h3>
+            <p id="hashResult" class="hash-result"></p>
+        </div>
+
+        <p id="errorMessage" class="error-message"></p>
+    </div>
+
+    <script>
+        let clickCount = 0;
+        let lastClickTime = 0;
+        const maxClicks = 3; // Maximum clicks in the time frame
+        const timeFrame = 3000; // 3 seconds time frame
+
+        // Function to generate SHA-256 hash
+        async function generateHash() {
+            const currentTime = Date.now();
+
+            // Check if user clicked too quickly
+            if (lastClickTime && currentTime - lastClickTime < timeFrame) {
+                clickCount++;
+            } else {
+                clickCount = 1; // Reset click count after delay
+            }
+            lastClickTime = currentTime;
+
+            // If the user clicked more than 'maxClicks' within the 'timeFrame'
+            if (clickCount > maxClicks) {
+                // Show the popup
+                document.getElementById('popupScreen').style.display = 'block';
+                setTimeout(() => {
+                    document.getElementById('popupScreen').style.display = 'none'; // Hide the popup after 3 seconds
+                }, 3000);
+            } else {
+                // Proceed with hash generation logic
+                const inputText = document.getElementById('inputText').value;
+                const fileInput = document.getElementById('fileInput').files[0];
+                const errorMessageElement = document.getElementById('errorMessage');
+                const hashResultElement = document.getElementById('hashResult');
+                
+                // Clear previous error or hash result
+                errorMessageElement.textContent = '';
+                hashResultElement.textContent = '';
+
+                // Check if the input is not empty or a file is selected
+                if (inputText.trim() === '' && !fileInput) {
+                    errorMessageElement.textContent = 'Please enter some text or upload a file.';
+                    return;
+                }
+
+                let data;
+
+                if (inputText.trim() !== '') {
+                    // Convert input string to a buffer
+                    const encoder = new TextEncoder();
+                    data = encoder.encode(inputText);
+                } else if (fileInput) {
+                    // Read the file as a buffer
+                    try {
+                        const fileReader = new FileReader();
+                        fileReader.onload = async function() {
+                            data = new Uint8Array(fileReader.result);
+                            await displayHash(data);
+                        };
+                        fileReader.readAsArrayBuffer(fileInput);
+                        return; // Wait for the file reading to finish
+                    } catch (error) {
+                        errorMessageElement.textContent = 'An error occurred while reading the file.'; 
+                        return;
+                    }
+                }
+
+                // Generate SHA-256 hash
+                await displayHash(data);
+            }
+        }
+
+        async function displayHash(data) {
+            const hashResultElement = document.getElementById('hashResult');
+            const errorMessageElement = document.getElementById('errorMessage');
+
+            try {
+                // Generate SHA-256 hash using Web Crypto API
+                const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+                
+                // Convert ArrayBuffer to hexadecimal string
+                const hashArray = Array.from(new Uint8Array(hashBuffer)); 
+                const hashHex = hashArray.map(byte => byte.toString(16).padStart(2, '0')).join('');
+
+                // Display the hash result
+                hashResultElement.textContent = hashHex;
+            } catch (error) {
+                errorMessageElement.textContent = 'An error occurred while generating the hash.';
+            }
+        }
+
+        // Cancel file selection
+        function cancelFileSelection() {
+            document.getElementById('fileInput').value = ''; // Reset the file input
+        }
+    </script>
+</body>
+</html>
